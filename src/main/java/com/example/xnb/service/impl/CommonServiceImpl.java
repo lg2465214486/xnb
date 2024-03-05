@@ -4,9 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.example.xnb.config.AdminSession;
-import com.example.xnb.entity.XNBSystem;
-import com.example.xnb.entity.XNBUser;
-import com.example.xnb.mapper.XNBSystemMapper;
+import com.example.xnb.entity.System;
+import com.example.xnb.entity.User;
+import com.example.xnb.mapper.SystemMapper;
 import com.example.xnb.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,38 +20,38 @@ import org.springframework.stereotype.Service;
 public class CommonServiceImpl implements CommonService {
 
     @Autowired
-    private XNBSystemMapper systemMapper;
+    private SystemMapper systemMapper;
 
     @Override
     public String getValueByKey(String key) {
-        XNBUser xnbUser = AdminSession.getInstance().admin();
-        XNBSystem v = systemMapper.selectOne(Wrappers.lambdaQuery(XNBSystem.class).eq(XNBSystem::getSysKey, key));
+        User user = AdminSession.getInstance().admin();
+        System v = systemMapper.selectOne(Wrappers.lambdaQuery(System.class).eq(System::getSysKey, key));
         String value = null == v ? "" : v.getSysValue();
-        if (ObjectUtil.isNotEmpty(xnbUser) && !"admin".equals(xnbUser.getUserType())){
+        if (ObjectUtil.isNotEmpty(user) && !"admin".equals(user.getUserType())){
             switch (key){
                 case "phone":
-                    if (StrUtil.isNotEmpty(xnbUser.getBtcAds()))
-                        value = xnbUser.getUstdAds();
+                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                        value = user.getUstdAds();
                     break;
                 case "qrCode":
-                    if (StrUtil.isNotEmpty(xnbUser.getBtcAds()))
-                        value = xnbUser.getUstdQrCode();
+                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                        value = user.getUstdQrCode();
                     break;
                 case "btcPhone":
-                    if (StrUtil.isNotEmpty(xnbUser.getBtcAds()))
-                        value = xnbUser.getBtcAds();
+                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                        value = user.getBtcAds();
                     break;
                 case "btcQrCode":
-                    if (StrUtil.isNotEmpty(xnbUser.getBtcAds()))
-                        value = xnbUser.getBtcQrCode();
+                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                        value = user.getBtcQrCode();
                     break;
                 case "ethPhone":
-                    if (StrUtil.isNotEmpty(xnbUser.getBtcAds()))
-                        value = xnbUser.getEthAds();
+                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                        value = user.getEthAds();
                     break;
                 case "ethQrCode":
-                    if (StrUtil.isNotEmpty(xnbUser.getBtcAds()))
-                        value = xnbUser.getEthQrCode();
+                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                        value = user.getEthQrCode();
                     break;
             }
         }

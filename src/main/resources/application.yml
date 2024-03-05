@@ -18,8 +18,7 @@ spring:
   datasource:
     druid:
       min-idle: 3
-      max-idle: 20
-      max-wait-millis: 5000  nnnnnnnnnnnnnnnnnnn
+      max-wait-millis: 5000
       validation-query: select 1
       initial-size: 1
       max-total: 20
@@ -66,10 +65,10 @@ spring:
         login-password: 123
         allow: 127.0.0.1
     driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://127.0.0.1:6789/xnb?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2b8
+#    url: jdbc:mysql://127.0.0.1:3636/xnb?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2b8
 #    username: root
 #    password: a0lfkljaIhgUkhM67!8566sdf7l82a783.
-    url: jdbc:mysql://103.242.12.98:6789/xnb?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2b8
+    url: jdbc:mysql://103.242.12.98:3636/xnb?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=GMT%2b8
     username: root
     password: a0lfkljaIhgUkhM67!8566sdf7l82a783.
     type: com.alibaba.druid.pool.DruidDataSource

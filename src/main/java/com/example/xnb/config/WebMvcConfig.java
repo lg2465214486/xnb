@@ -1,6 +1,6 @@
 package com.example.xnb.config;
 
-import com.example.xnb.entity.XNBUser;
+import com.example.xnb.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private static final String SESSION_KEY = "session:admin:";
 
     @Autowired
-    private RedisTemplate<String, XNBUser> redisTemplate;
+    private RedisTemplate<String, User> redisTemplate;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -41,7 +41,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
             try {
                 if (!request.getMethod().equalsIgnoreCase(RequestMethod.OPTIONS.toString())) {
-                    XNBUser user = AdminSession.getInstance().admin();
+                    User user = AdminSession.getInstance().admin();
                     if (null == user) {
                         throw new Exception("login failure");
                     } else {

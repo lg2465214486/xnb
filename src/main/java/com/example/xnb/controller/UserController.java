@@ -3,7 +3,7 @@ package com.example.xnb.controller;
 
 import com.example.xnb.config.AdminSession;
 import com.example.xnb.config.JsonResult;
-import com.example.xnb.service.IXNBUserService;
+import com.example.xnb.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
-    private IXNBUserService userService;
+    private IUserService userService;
     /**
      * 获取用户信息
      * @return

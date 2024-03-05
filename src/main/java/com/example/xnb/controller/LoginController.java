@@ -5,7 +5,7 @@ import com.example.xnb.config.AdminSession;
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.pojo.LoginParam;
 import com.example.xnb.service.CommonService;
-import com.example.xnb.service.IXNBUserService;
+import com.example.xnb.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
     @Autowired
-    private IXNBUserService xnbUserService;
+    private IUserService userService;
     @Autowired
     private CommonService commonService;
 
@@ -25,7 +25,7 @@ public class LoginController {
      */
     @PostMapping("/user/login")
     public JsonResult login(@RequestBody LoginParam login) {
-        return xnbUserService.userLogin(login);
+        return userService.userLogin(login);
     }
 
     /**
@@ -35,7 +35,7 @@ public class LoginController {
      */
     @PostMapping("/user/adminLogin")
     public JsonResult adminLogin(@RequestBody LoginParam login) {
-        return xnbUserService.adminUserLogin(login);
+        return userService.adminUserLogin(login);
     }
 
     /**

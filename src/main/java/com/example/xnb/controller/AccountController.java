@@ -4,7 +4,7 @@ package com.example.xnb.controller;
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.pojo.ConversionParam;
 import com.example.xnb.pojo.MoneyOptionParam;
-import com.example.xnb.service.IXNBUserService;
+import com.example.xnb.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class AccountController {
 
     @Autowired
-    private IXNBUserService userService;
+    private IUserService userService;
 
     /**
      * 充值

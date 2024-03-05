@@ -4,7 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.config.JsonResultUtil;
-import com.example.xnb.service.IXNBSystemService;
+import com.example.xnb.service.ISystemService;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +35,7 @@ public class FileController {
     @Value("${file.downloadPath}")
     private String downloadPath;
     @Autowired
-    private IXNBSystemService systemService;
+    private ISystemService systemService;
 
 
     @PostMapping("/uploadImage")

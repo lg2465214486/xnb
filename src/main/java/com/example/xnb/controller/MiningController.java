@@ -3,7 +3,7 @@ package com.example.xnb.controller;
 
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.pojo.MiningParam;
-import com.example.xnb.service.IXNBUnderwayService;
+import com.example.xnb.service.IUnderwayService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 public class MiningController {
 
     @Autowired
-    private IXNBUnderwayService underwayService;
+    private IUnderwayService underwayService;
 
     /**
      * 总收益查询

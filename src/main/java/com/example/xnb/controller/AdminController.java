@@ -2,8 +2,8 @@ package com.example.xnb.controller;
 
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.config.JsonResultUtil;
-import com.example.xnb.entity.XNBVip;
-import com.example.xnb.mapper.XNBVipMapper;
+import com.example.xnb.entity.Vip;
+import com.example.xnb.mapper.VipMapper;
 import com.example.xnb.pojo.ExamineParam;
 import com.example.xnb.pojo.SysEditParam;
 import com.example.xnb.pojo.ListParam;
@@ -21,15 +21,15 @@ public class AdminController {
 
 
     @Autowired
-    private IXNBUserService userService;
+    private IUserService userService;
     @Autowired
-    private IXNBSystemService systemService;
+    private ISystemService systemService;
     @Autowired
-    private IXNBTopUpService topUpService;
+    private ITopUpService topUpService;
     @Autowired
-    private IXNBUnderwayService underwayService;
+    private IUnderwayService underwayService;
     @Autowired
-    private IXNBWithdrawService withdrawService;
+    private IWithdrawService withdrawService;
     @Autowired
     private CommonService commonService;
     /**
@@ -106,7 +106,7 @@ public class AdminController {
     }
 
     @Autowired
-    private XNBVipMapper xnbVipMapper;
+    private VipMapper vipMapper;
 
     /**
      * vip列表
@@ -114,7 +114,7 @@ public class AdminController {
      */
     @GetMapping("/user/vipList")
     public JsonResult vipList() {
-        return JsonResultUtil.success(xnbVipMapper.selectList(null));
+        return JsonResultUtil.success(vipMapper.selectList(null));
     }
 
     /**
@@ -123,9 +123,9 @@ public class AdminController {
      */
     @PostMapping("/user/vipEdit")
     public JsonResult vipEdit(@RequestBody VipEditParam vipEditParam) {
-        XNBVip xnbVip = xnbVipMapper.selectById(vipEditParam.getId());
-        xnbVip.setXnbRate(vipEditParam.getVipRate());
-        xnbVipMapper.updateById(xnbVip);
+        Vip vip = vipMapper.selectById(vipEditParam.getId());
+        vip.setRate(vipEditParam.getVipRate());
+        vipMapper.updateById(vip);
         return JsonResultUtil.success();
     }
 
