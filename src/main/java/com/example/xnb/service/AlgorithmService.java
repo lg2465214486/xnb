@@ -8,5 +8,5 @@ import java.util.List;
 public interface AlgorithmService {
     void addCoinGenerateData(Coin param);
 
-    List<LocalDateTime> generateTimeList(LocalDateTime issueTime);
+    List<LocalDateTime> generateTimeList(LocalDateTime startTime, LocalDateTime endTime);
 }
