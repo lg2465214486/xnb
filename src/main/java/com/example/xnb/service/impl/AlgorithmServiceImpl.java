@@ -26,7 +26,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
     private ICandlestickChartService candlestickChartService;
 
     private static final Integer DAY_OF_INCREASE = 5;
-    private static final Integer INCREASE = 20;
+    private static final Integer INCREASE = 10;
     private static final Random MY_RANDOM = new Random();
 
     @Override
@@ -48,7 +48,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
         Integer startPriceOf24Hours = coin.getStartPrice().multiply(new BigDecimal(100)).intValue();
         List<Integer> datas = null;
         int count=48;
-        for (int i = 0; i < timeList.size(); i++) {
+        for (int i = 0; i < timeList.size() - 1; i++) {
             if (count == 48) {
                 int flag = MY_RANDOM.nextInt(3);
 //                if (startPriceOf24Hours * (DAY_OF_INCREASE + 100) / 100 > max) {
@@ -82,21 +82,21 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 //        } else if (startPriceOf24Hours.compareTo(coin.getPrice().multiply(new BigDecimal(100)).intValue()) < 0) {
 //            coefficient = (lastPrice - startPriceOf24Hours) / lastTimeList.size();
 //        }
-        List<Integer> sss = this.generateArray(lastPrice - startPriceOf24Hours);
+        int[] sss = this.generateBalancedArray(lastPrice - startPriceOf24Hours);
         Integer p = startPriceOf24Hours;
-        for (int i = 1; i < lastTimeList.size(); i++) {
+        for (int i = 0; i < lastTimeList.size(); i++) {
             CandlestickChart candlestickChart = new CandlestickChart();
             candlestickChart.setTime(lastTimeList.get(i));
             candlestickChart.setWeek(lastTimeList.get(i).getDayOfWeek().getValue());
             candlestickChart.setCoinId(coin.getId());
 
-            int price = p + sss.get(i - 1);
 //            int price = this.randomPrice(p, p + coefficient);
             if (i == (lastTimeList.size() - 1)) {
                 candlestickChart.setPrice(coin.getPrice());
             } else {
-                candlestickChart.setPrice(new BigDecimal(price).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+                candlestickChart.setPrice(new BigDecimal(p + sss[i]).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             }
+            int price = candlestickChart.getPrice().multiply(new BigDecimal(100)).intValue();
             int thisTimeMax = price * 110 / 100;
             int thisTimeMin = price * 90 / 100;
 
@@ -171,18 +171,46 @@ public class AlgorithmServiceImpl implements AlgorithmService {
         }
     }
 
-    public List<Integer> generateArray(int sum) {
-        List<Integer> array = new ArrayList<>();
-        int currentSum = 0;
+    public int[] generateBalancedArray(int targetSum) {
+        int[] result = new int[48];
         Random random = new Random();
+        int currentSum = 0;
 
-        while (currentSum != sum) {
-            int value = random.nextInt(20) - 10;  // 生成-10 到 10 之间的随机数
-            if (currentSum > 47)
-                break;
-            array.add(value);
-            currentSum++;
+        // 初始化数组，确保有正有负数
+        for (int i = 0; i < result.length; i++) {
+            // 交替放置正负数，确保之间差值在1到10之间
+            int value = (i % 2 == 0 ? 1 : -1) * (1 + random.nextInt(10));
+            result[i] = value;
+            currentSum += value;
         }
-        return array;
+
+        // 调整以匹配目标和
+        int index = 0;
+        while (currentSum != targetSum) {
+            // 找到可以增加或减少的值，以逼近目标和，同时保持正负数和差值条件
+            int adjustment = Math.min(Math.abs(targetSum - currentSum), 10);
+            if (currentSum < targetSum) {
+                // 如果当前和小于目标，增加某个正数或减少一个负数
+                if (result[index] > 0) {
+                    result[index] += adjustment;
+                } else if (result[index] - adjustment >= -10) { // 确保不会超过负数的最大差值限制
+                    result[index] -= adjustment;
+                }
+            } else {
+                // 如果当前和大于目标，减少某个正数或增加一个负数
+                if (result[index] < 0) {
+                    result[index] -= adjustment;
+                } else if (result[index] + adjustment <= 10) { // 确保不会超过正数的最大差值限制
+                    result[index] += adjustment;
+                }
+            }
+            currentSum = 0;
+            for (int value : result) {
+                currentSum += value;
+            }
+            index = (index + 1) % result.length;
+        }
+
+        return result;
     }
 }
