@@ -74,13 +74,20 @@ public class AlgorithmServiceImpl implements AlgorithmService {
             candlestickChartList.add(candlestickChart);
             count++;
         }
-        //todo: a
+        Integer lastPrice = coin.getPrice().multiply(new BigDecimal(100)).intValue();
+        Integer coefficient = 0;
+        if (startPriceOf24Hours.compareTo(coin.getPrice().multiply(new BigDecimal(100)).intValue()) > 0) {
+            coefficient = lastPrice / startPriceOf24Hours / lastTimeList.size();
+        } else if (startPriceOf24Hours.compareTo(coin.getPrice().multiply(new BigDecimal(100)).intValue()) < 0) {
+            coefficient = -(startPriceOf24Hours / lastPrice / lastTimeList.size());
+        }
         Integer p = startPriceOf24Hours;
         for (int i = 1; i < lastTimeList.size(); i++) {
             CandlestickChart candlestickChart = new CandlestickChart();
             candlestickChart.setTime(timeList.get(i));
             candlestickChart.setCoinId(coin.getId());
-            int price = datas.get(i % 48);
+
+            int price = this.randomPrice(p, p * (100 + coefficient) / 100);
             candlestickChart.setPrice(new BigDecimal(price).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
 
             int thisTimeMax = price * 110 / 100;
@@ -89,6 +96,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
             candlestickChart.setMaxPrice(new BigDecimal(price + MY_RANDOM.nextInt(thisTimeMax - price + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(price - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChartList.add(candlestickChart);
+            p = price;
         }
 
 //        int max = Math.max(coin.getStartPrice().multiply(new BigDecimal(100)).intValue(), coin.getPrice().multiply(new BigDecimal(100)).intValue()) * 120 / 100;
@@ -107,7 +115,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
 //            candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + random.nextInt(price - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
 //            candlestickChartList.add(candlestickChart);
 //        }
-//        candlestickChartService.saveBatch(candlestickChartList);
+        candlestickChartService.saveBatch(candlestickChartList);
     }
 
     @Override
@@ -146,5 +154,11 @@ public class AlgorithmServiceImpl implements AlgorithmService {
                 break;
         }
         return list;
+    }
+
+    public Integer randomPrice(Integer price1, Integer price2) {
+        Integer max = Math.max(price1, price2);
+        Integer min = Math.min(price1, price2);
+        return min + MY_RANDOM.nextInt(max - min + 1);
     }
 }
