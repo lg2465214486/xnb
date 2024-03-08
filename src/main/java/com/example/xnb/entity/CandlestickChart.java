@@ -33,5 +33,7 @@ public class CandlestickChart implements Serializable {
 
     private LocalDateTime time;
 
+    private Integer week;
+
 
 }

@@ -62,6 +62,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
             }
             CandlestickChart candlestickChart = new CandlestickChart();
             candlestickChart.setTime(timeList.get(i));
+            candlestickChart.setWeek(timeList.get(i).getDayOfWeek().getValue());
             candlestickChart.setCoinId(coin.getId());
             int price = datas.get(i % 48);
             candlestickChart.setPrice(new BigDecimal(price).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
@@ -84,7 +85,8 @@ public class AlgorithmServiceImpl implements AlgorithmService {
         Integer p = startPriceOf24Hours;
         for (int i = 1; i < lastTimeList.size(); i++) {
             CandlestickChart candlestickChart = new CandlestickChart();
-            candlestickChart.setTime(timeList.get(i));
+            candlestickChart.setTime(lastTimeList.get(i));
+            candlestickChart.setWeek(lastTimeList.get(i).getDayOfWeek().getValue());
             candlestickChart.setCoinId(coin.getId());
 
             int price = this.randomPrice(p, p * (100 + coefficient) / 100);
