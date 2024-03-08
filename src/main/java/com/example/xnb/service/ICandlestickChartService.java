@@ -1,6 +1,7 @@
 package com.example.xnb.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.xnb.config.JsonResult;
 import com.example.xnb.entity.CandlestickChart;
 
 /**
@@ -13,4 +14,5 @@ import com.example.xnb.entity.CandlestickChart;
  */
 public interface ICandlestickChartService extends IService<CandlestickChart> {
 
+    JsonResult lineList(String coinId, String flag);
 }

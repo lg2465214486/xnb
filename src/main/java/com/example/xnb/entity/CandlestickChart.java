@@ -1,5 +1,6 @@
 package com.example.xnb.entity;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -31,9 +32,15 @@ public class CandlestickChart implements Serializable {
 
     private BigDecimal maxPrice;
 
-    private LocalDateTime time;
+    private String time;
 
     private Integer week;
 
+    public LocalDateTime getTime() {
+        return LocalDateTime.parse(time.replace(" ", "T"));
+    }
 
+    public void setTime(LocalDateTime time) {
+        this.time = LocalDateTimeUtil.format(time, "yyyy-MM-dd HH:mm:ss");
+    }
 }

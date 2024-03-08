@@ -35,7 +35,7 @@ public class Coin implements Serializable {
 
     private String info;
 
-    private BigDecimal defaulePrice;
+    private BigDecimal defaultPrice;
 
     private LocalDateTime issueDate;
 
