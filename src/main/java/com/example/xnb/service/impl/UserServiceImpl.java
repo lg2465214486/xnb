@@ -187,25 +187,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         TopUp topUp = new TopUp();
         topUp.setUserId(u.getId());
         topUp.setSales(new BigDecimal(param.getAmount()));
-        topUp.setStatus(2);
+        topUp.setStatus(1);
         topUp.setCreatedDate(LocalDateTime.now());
         topUp.setUpdatedDate(LocalDateTime.now());
         topUp.setBz(param.getBz());
         topUpMapper.insert(topUp);
-        switch (param.getBz()){
-            case "ustd":
-                u.setUstd(u.getUstd().add(new BigDecimal(param.getAmount())));
-                break;
-            case "btc":
-                u.setBtc(u.getBtc().add(new BigDecimal(param.getAmount())));
-                break;
-            case "eth":
-                u.setEth(u.getEth().add(new BigDecimal(param.getAmount())));
-                break;
-        }
-        userMapper.updateById(u);
-        if (StrUtil.isNotEmpty(u.getToken()))
-            AdminSession.getInstance().updateAdmin(u.getToken(),u);
+        //switch (param.getBz()){
+        //    case "ustd":
+        //        u.setUstd(u.getUstd().add(new BigDecimal(param.getAmount())));
+        //        break;
+        //    case "btc":
+        //        u.setBtc(u.getBtc().add(new BigDecimal(param.getAmount())));
+        //        break;
+        //    case "eth":
+        //        u.setEth(u.getEth().add(new BigDecimal(param.getAmount())));
+        //        break;
+        //}
+        //userMapper.updateById(u);
+        //if (StrUtil.isNotEmpty(u.getToken()))
+        //    AdminSession.getInstance().updateAdmin(u.getToken(),u);
         return "success";
     }
 

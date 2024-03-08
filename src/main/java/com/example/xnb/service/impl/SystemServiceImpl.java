@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -62,6 +63,23 @@ public class SystemServiceImpl extends ServiceImpl<SystemMapper, System> impleme
         TopUp topUp = topUpMapper.selectById(param.getId());
         topUp.setUpdatedDate(LocalDateTime.now());
         topUp.setStatus(param.getStatus());
+        User u = userMapper.selectById(topUp.getUserId());
+        if(topUp.getStatus() == 2){
+            switch (topUp.getBz()){
+                case "ustd":
+                    u.setUstd(u.getUstd().add(topUp.getSales()));
+                    break;
+                case "btc":
+                    u.setBtc(u.getBtc().add(topUp.getSales()));
+                    break;
+                case "eth":
+                    u.setEth(u.getEth().add(topUp.getSales()));
+                    break;
+            }
+        }
+        userMapper.updateById(u);
+        if (StrUtil.isNotEmpty(u.getToken()))
+            AdminSession.getInstance().updateAdmin(u.getToken(),u);
         topUpMapper.updateById(topUp);
         return "success";
     }
