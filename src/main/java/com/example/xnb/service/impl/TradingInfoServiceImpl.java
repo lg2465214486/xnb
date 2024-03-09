@@ -48,6 +48,7 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
         return this.list(wrapper);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void trading(TradingParam param) {
 

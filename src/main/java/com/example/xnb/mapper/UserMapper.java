@@ -3,6 +3,7 @@ package com.example.xnb.mapper;
 import com.example.xnb.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -22,4 +23,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("select * from user where uuid=#{uuid}")
     User selectByUuid(String uuid);
+
+    @Update("update `user` set is_real = 1 where id=#{id}")
+    void updateRealStatus(Integer Id);
 }

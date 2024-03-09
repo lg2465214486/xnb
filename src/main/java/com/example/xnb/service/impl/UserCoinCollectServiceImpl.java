@@ -8,6 +8,7 @@ import com.example.xnb.mapper.UserCoinCollectMapper;
 import com.example.xnb.service.IUserCoinCollectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -20,6 +21,7 @@ public class UserCoinCollectServiceImpl extends ServiceImpl<UserCoinCollectMappe
     @Autowired
     private UserCoinCollectMapper userCoinCollectMapper;
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void collectCoin(String coinId, int i) {
         Integer userId = AdminSession.getInstance().admin().getId();

@@ -2,10 +2,8 @@ package com.example.xnb.entity;
 
 import java.math.BigDecimal;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
@@ -28,6 +26,7 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@TableName("`user`")
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -79,6 +78,11 @@ public class User implements Serializable {
      */
     private Boolean isStop;
 
+    /**
+     * 是否实名  0：否  1：是
+     */
+    private Integer isReal;
+
     private String token;
 
     private String userType;
@@ -95,4 +99,7 @@ public class User implements Serializable {
 
     @TableField(exist = false)
     private String vipName;
+
+    @TableField(exist = false)
+    private Real realInfo;
 }

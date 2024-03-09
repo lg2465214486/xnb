@@ -36,4 +36,9 @@ public class UserInfo {
     String eth;
 
     String vipName;
+
+    /**
+     * 是否实名  0：否  1：是
+     */
+    Integer isReal;
 }

@@ -7,10 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.xnb.config.AdminSession;
 import com.example.xnb.config.JsonResult;
-import com.example.xnb.entity.TopUp;
-import com.example.xnb.entity.User;
-import com.example.xnb.entity.Vip;
-import com.example.xnb.entity.Withdraw;
+import com.example.xnb.entity.*;
 import com.example.xnb.mapper.TopUpMapper;
 import com.example.xnb.mapper.UserMapper;
 import com.example.xnb.mapper.VipMapper;
@@ -19,6 +16,7 @@ import com.example.xnb.pojo.*;
 import com.example.xnb.pojo.dto.DealDetail;
 import com.example.xnb.pojo.dto.UserInfo;
 import com.example.xnb.service.CommonService;
+import com.example.xnb.service.IRealService;
 import com.example.xnb.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.xnb.util.MyDateUtils;
@@ -29,10 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -55,6 +51,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private CommonService commonService;
     @Autowired
     private VipMapper vipMapper;
+    @Autowired
+    private IRealService realService;
 
     @Override
     public JsonResult userLogin(LoginParam login) {
@@ -107,12 +105,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         wrapper.ne(User::getUserType,"admin");
         wrapper.orderByDesc(User::getCreatedDate);
         Page<User> userPage = userMapper.selectPage(page, wrapper);
+        Map<Integer, Real> realMap = realService.list().stream().collect(Collectors.toMap(Real::getUserId, o -> o));
         for (User user : userPage.getRecords()) {
             user.setVipName("VIP0");
             if (ObjectUtil.isNotEmpty(user.getVipGrade())) {
                 Vip vip = vipMapper.selectById(user.getVipGrade());
                 user.setVipName(vip.getVipName());
             }
+            user.setRealInfo(realMap.get(user.getId()));
         }
 
         return userPage;
@@ -339,6 +339,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userInfo.setEth(user.getEth().setScale(4, RoundingMode.HALF_UP).toPlainString());
         userInfo.setUstd(user.getUstd().setScale(4, RoundingMode.HALF_UP).toPlainString());
         userInfo.setBtc(user.getBtc().setScale(4, RoundingMode.HALF_UP).toPlainString());
+        userInfo.setIsReal(user.getIsReal());
         return userInfo;
     }
 

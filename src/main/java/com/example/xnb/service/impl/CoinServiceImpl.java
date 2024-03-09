@@ -86,6 +86,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         return returnList;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void delCoin(String coinId) {
         Coin c = this.getOne(new LambdaQueryWrapper<Coin>().eq(Coin::getIsDel, 0).eq(Coin::getId, coinId));
@@ -96,6 +97,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         this.updateById(c);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void setIncrease(String coinId, int increase) {
         Coin c = this.getOne(new LambdaQueryWrapper<Coin>().eq(Coin::getIsDel, 0).eq(Coin::getId, coinId));
