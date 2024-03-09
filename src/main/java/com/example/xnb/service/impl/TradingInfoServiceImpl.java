@@ -5,27 +5,25 @@ import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.xnb.config.AdminSession;
 import com.example.xnb.entity.Coin;
+import com.example.xnb.entity.HoldCoin;
 import com.example.xnb.entity.TradingInfo;
-import com.example.xnb.entity.UserCoinCollect;
+import com.example.xnb.entity.User;
 import com.example.xnb.exception.GlobalException;
-import com.example.xnb.mapper.CoinMapper;
+import com.example.xnb.mapper.HoldCoinMapper;
 import com.example.xnb.mapper.TradingInfoMapper;
-import com.example.xnb.mapper.UserCoinCollectMapper;
 import com.example.xnb.mapper.UserMapper;
-import com.example.xnb.pojo.AddCoinParam;
 import com.example.xnb.pojo.TradingParam;
-import com.example.xnb.service.AlgorithmService;
 import com.example.xnb.service.ICoinService;
 import com.example.xnb.service.ITradingInfoService;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +36,10 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private ICoinService coinService;
+    @Autowired
+    private HoldCoinMapper holdCoinMapper;
 
     @Override
     public List<TradingInfo> info(String coinId, Integer id) {
@@ -51,6 +53,60 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void trading(TradingParam param) {
+        LocalDateTime now = LocalDateTime.now();
+        User user = userMapper.selectById(AdminSession.getInstance().admin().getId());
+        if (ObjectUtils.isEmpty(user)) {
+            throw new GlobalException(500, "session expired");
+        }
+        Coin coin = coinService.getOne(new LambdaQueryWrapper<Coin>().eq(Coin::getId, param.getCoinId()).eq(Coin::getIsDel, 0));
+        if (ObjectUtils.isEmpty(coin)) {
+            throw new GlobalException(500, "coin not exist");
+        }
+        HoldCoin holdCoin = holdCoinMapper.selectOne(new LambdaQueryWrapper<HoldCoin>()
+                .eq(HoldCoin::getUserId, user.getId())
+                .eq(HoldCoin::getCoinId, param.getCoinId()));
 
+        BigDecimal price = coin.getPrice().multiply(param.getCount());
+        TradingInfo tradingInfo = new TradingInfo();
+        if (param.getStatus() == 1) {
+            if (coin.getPrice().multiply(param.getCount()).compareTo(user.getUstd()) > 0) {
+                throw new GlobalException(500, "not sufficient funds");
+            }
+
+            if (ObjectUtils.isEmpty(holdCoin)) {
+                holdCoin = new HoldCoin();
+                holdCoin.setUserId(user.getId());
+                holdCoin.setCoinId(coin.getId());
+                holdCoin.setCount(param.getCount());
+                holdCoin.setPrice(price);
+                holdCoinMapper.insert(holdCoin);
+            } else {
+                holdCoin.setCount(holdCoin.getCount().add(param.getCount()).setScale(2, RoundingMode.HALF_UP));
+                holdCoin.setPrice(holdCoin.getPrice().add(price).setScale(2, RoundingMode.HALF_UP));
+                holdCoinMapper.updateById(holdCoin);
+            }
+            user.setUstd(user.getUstd().subtract(price).setScale(2, RoundingMode.HALF_UP));
+        } else {
+            if (ObjectUtils.isEmpty(holdCoin)) {
+                throw new GlobalException(500, "coin not hold");
+            }
+            if (param.getCount().compareTo(holdCoin.getCount()) > 0) {
+                throw new GlobalException(500, "hold coi not enough");
+            }
+            holdCoin.setCount(holdCoin.getCount().subtract(param.getCount()).setScale(2, RoundingMode.HALF_UP));
+            holdCoin.setPrice(holdCoin.getPrice().subtract(price).setScale(2, RoundingMode.HALF_UP));
+            holdCoinMapper.updateById(holdCoin);
+            user.setUstd(user.getUstd().add(price).setScale(2, RoundingMode.HALF_UP));
+        }
+        tradingInfo.setUserId(user.getId());
+        tradingInfo.setCoinId(coin.getId());
+        tradingInfo.setPrice(price);
+        tradingInfo.setCount(param.getCount());
+        tradingInfo.setSinglePrice(coin.getPrice());
+        tradingInfo.setStatus(param.getStatus());
+        tradingInfo.setTime(now);
+
+        userMapper.updateById(user);
+        this.save(tradingInfo);
     }
 }

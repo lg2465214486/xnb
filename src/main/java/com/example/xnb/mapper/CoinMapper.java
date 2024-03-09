@@ -21,7 +21,7 @@ public interface CoinMapper extends BaseMapper<Coin> {
 
     List<Coin> selectNeedGenerateCoin(@Param("now") String now);
 
-    List<CoinListDto> selectAllList(@Param("ids") List<String> ids, @Param("now") LocalDateTime now, @Param("yestoday") LocalDateTime yestoday);
+    List<CoinListDto> selectAllList(@Param("ids") List<String> ids, @Param("now") String now, @Param("yestoday") String yestoday);
 
-    CoinDto selectInfo(@Param("id") String id, @Param("now") LocalDateTime now, @Param("today") LocalDateTime today, @Param("yestoday") LocalDateTime yestoday);
+    CoinDto selectInfo(@Param("id") String id, @Param("now") String now, @Param("today") String today, @Param("yestoday") String yestoday);
 }

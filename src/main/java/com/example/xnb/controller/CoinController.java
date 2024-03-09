@@ -1,8 +1,10 @@
 package com.example.xnb.controller;
 
+import com.example.xnb.config.AdminSession;
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.pojo.AddCoinParam;
 import com.example.xnb.service.ICoinService;
+import com.example.xnb.service.IHoldCoinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,8 @@ public class CoinController {
 
     @Autowired
     private ICoinService coinService;
+    @Autowired
+    private IHoldCoinService holdCoinList;
 
     /**
      * 添加coin
@@ -50,8 +54,14 @@ public class CoinController {
     }
 
     @GetMapping("/list")
-    public JsonResult userList(int collect) {
+    public JsonResult coinList(int collect) {
         return new JsonResult(coinService.allList(collect));
+    }
+
+    @GetMapping("/hold/list")
+    public JsonResult holdCoinList() {
+        Integer userId = AdminSession.getInstance().admin().getId();
+        return new JsonResult(holdCoinList.holdCoinList(userId));
     }
 
     @GetMapping("/info")

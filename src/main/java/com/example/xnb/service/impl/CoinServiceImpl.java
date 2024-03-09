@@ -1,5 +1,6 @@
 package com.example.xnb.service.impl;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -63,8 +64,9 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
     public List<List<Object>> allList(int collect) {
         List<List<Object>> returnList = new ArrayList<>();
         List<CoinListDto> coinList = null;
-        LocalDateTime now = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
-        LocalDateTime yestoday = now.minusDays(1);
+        LocalDateTime nowTime = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
+        String now = LocalDateTimeUtil.format(LocalDateTime.now().withSecond(0).withMinute(0).withHour(0), "yyyy-MM-dd HH:mm:ss");
+        String yestoday = LocalDateTimeUtil.format(nowTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
         if (1 == collect) {
             Integer id = AdminSession.getInstance().admin().getId();
             LambdaQueryWrapper<UserCoinCollect> collectWrapper = new LambdaQueryWrapper<>();
@@ -77,6 +79,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         }
         for (CoinListDto c : coinList) {
             List<Object> l = new ArrayList<>();
+            l.add(c.getId());
             l.add(c.getName());
             l.add(c.getImage());
             l.add(c.getPrice());
@@ -110,10 +113,11 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
 
     @Override
     public CoinDto info(String coinId) {
-        LocalDateTime now = LocalDateTime.now();
-        now = algorithmService.convertBeforeThirtyMinute(now);
-        LocalDateTime today = now.withSecond(0).withMinute(0).withHour(0);
-        LocalDateTime yestoday = today.minusDays(1);
+        LocalDateTime nowTime = LocalDateTime.now();
+        String now = LocalDateTimeUtil.format(algorithmService.convertBeforeThirtyMinute(nowTime), "yyyy-MM-dd HH:mm:ss");
+        LocalDateTime todayTime = nowTime.withSecond(0).withMinute(0).withHour(0);
+        String today = LocalDateTimeUtil.format(nowTime.withSecond(0).withMinute(0).withHour(0), "yyyy-MM-dd HH:mm:ss");
+        String yestoday = LocalDateTimeUtil.format(todayTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
         return coinMapper.selectInfo(coinId, now, today, yestoday);
     }
 }
