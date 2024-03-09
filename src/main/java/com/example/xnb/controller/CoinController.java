@@ -50,7 +50,12 @@ public class CoinController {
     }
 
     @GetMapping("/list")
-    public Object userList(int collect) {
-        return coinService.allList(collect);
+    public JsonResult userList(int collect) {
+        return new JsonResult(coinService.allList(collect));
+    }
+
+    @GetMapping("/info")
+    public JsonResult info(String coinId) {
+        return new JsonResult(coinService.info(coinId));
     }
 }

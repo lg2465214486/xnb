@@ -131,6 +131,17 @@ public class AlgorithmServiceImpl implements AlgorithmService {
         return time;
     }
 
+    @Override
+    public LocalDateTime convertBeforeThirtyMinute(LocalDateTime time) {
+        time = time.withSecond(0);
+        if (time.getMinute() > 0 && time.getMinute() < 30) {
+            time = time.withMinute(0);
+        } else if (time.getMinute() > 30) {
+            time = time.withMinute(30);
+        }
+        return time;
+    }
+
     public List<Integer> generate24HoursData(Integer price, int flag, Integer max, Integer min) {
         List<Integer> list = new ArrayList<>();
 

@@ -11,4 +11,6 @@ public interface AlgorithmService {
     List<LocalDateTime> generateTimeList(LocalDateTime startTime, LocalDateTime endTime);
 
     LocalDateTime convertThirtyMinute(LocalDateTime time);
+
+    LocalDateTime convertBeforeThirtyMinute(LocalDateTime time);
 }

@@ -3,6 +3,7 @@ package com.example.xnb.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.xnb.entity.Coin;
 import com.example.xnb.pojo.AddCoinParam;
+import com.example.xnb.pojo.dto.CoinDto;
 
 import java.util.List;
 
@@ -18,9 +19,11 @@ public interface ICoinService extends IService<Coin> {
 
     void addCoin(AddCoinParam param);
 
-    List<Coin> allList(int collect);
+    List<List<Object>> allList(int collect);
 
     void delCoin(String coinId);
 
     void setIncrease(String coinId, int increase);
+
+    CoinDto info(String coinId);
 }

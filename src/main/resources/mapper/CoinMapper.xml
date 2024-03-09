@@ -8,4 +8,44 @@
                  left join (select * from candlestick_chart where time = #{now}) b on a.id = b.coin_id
         where b.coin_id is null;
     </select>
+    <select id="selectAllList" resultType="com.example.xnb.pojo.dto.CoinListDto">
+        select a.id as id,
+               a.name as name,
+               a.image as image,
+               a.price as price,
+               b.price/c.price*100 as increase24Hours
+        from coin a
+                 left join (select * from candlestick_chart where time = #{now}) b on a.id = b.coin_id
+                 left join (select * from candlestick_chart where time = #{yestoday}) c on a.id = c.coin_id
+        where a.is_del = 0
+        <if test="ids != null">
+          and a.id in
+            <foreach collection="ids" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    <select id="selectInfo" resultType="com.example.xnb.pojo.dto.CoinDto">
+        select a.id as id,
+               a.name as name,
+               a.image as image,
+               a.info as info,
+               a.default_price as defaultPrice,
+               a.issue_date as issueDate,
+               a.issue_count as issueCount,
+               a.price as price,
+               a.circulate_count as circulateCount,
+               a.home_link as homeLink,
+               a.white_paper as whitePaper,
+               b.price/c.price*100 as increase24Hours,
+               d.max_price as high,
+               d.min_price as low
+        from coin a
+                 left join (select * from candlestick_chart where time = #{today}) b on a.id = b.coin_id
+                 left join (select * from candlestick_chart where time = #{yestoday}) c on a.id = c.coin_id
+                 left join (select * from candlestick_chart where time = #{now}) d on a.id = d.coin_id
+        where a.is_del = 0 and a.id=#{id}
+    </select>
+
+
 </mapper>

@@ -7,10 +7,14 @@ import com.example.xnb.config.AdminSession;
 import com.example.xnb.entity.Coin;
 import com.example.xnb.entity.UserCoinCollect;
 import com.example.xnb.exception.GlobalException;
+import com.example.xnb.mapper.CandlestickChartMapper;
 import com.example.xnb.mapper.CoinMapper;
 import com.example.xnb.mapper.UserCoinCollectMapper;
 import com.example.xnb.pojo.AddCoinParam;
+import com.example.xnb.pojo.dto.CoinDto;
+import com.example.xnb.pojo.dto.CoinListDto;
 import com.example.xnb.service.AlgorithmService;
+import com.example.xnb.service.ICandlestickChartService;
 import com.example.xnb.service.ICoinService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +39,10 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
     private AlgorithmService algorithmService;
     @Autowired
     private UserCoinCollectMapper userCoinCollectMapper;
+    @Autowired
+    private CandlestickChartMapper candlestickChartsMapper;
+    @Autowired
+    private CoinMapper coinMapper;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -53,19 +60,30 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
     }
 
     @Override
-    public List<Coin> allList(int collect) {
-        LambdaQueryWrapper<Coin> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Coin::getIsDel, 0);
+    public List<List<Object>> allList(int collect) {
+        List<List<Object>> returnList = new ArrayList<>();
+        List<CoinListDto> coinList = null;
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
+        LocalDateTime yestoday = now.minusDays(1);
         if (1 == collect) {
             Integer id = AdminSession.getInstance().admin().getId();
             LambdaQueryWrapper<UserCoinCollect> collectWrapper = new LambdaQueryWrapper<>();
             collectWrapper.eq(UserCoinCollect::getUserId, id);
             List<UserCoinCollect> collects = userCoinCollectMapper.selectList(collectWrapper);
-            wrapper.in(Coin::getId, collects.stream().map(UserCoinCollect::getCoinId).collect(Collectors.toList()));
-            return this.list(wrapper);
+            List<String> coinIds = collects.stream().map(UserCoinCollect::getCoinId).collect(Collectors.toList());
+            coinList = coinMapper.selectAllList(coinIds, now, yestoday);
         } else {
-            return this.list();
+            coinList = coinMapper.selectAllList(null, now, yestoday);
         }
+        for (CoinListDto c : coinList) {
+            List<Object> l = new ArrayList<>();
+            l.add(c.getName());
+            l.add(c.getImage());
+            l.add(c.getPrice());
+            l.add(c.getIncrease24Hours());
+            returnList.add(l);
+        }
+        return returnList;
     }
 
     @Override
@@ -86,5 +104,14 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         }
         c.setIncrease(new BigDecimal(increase).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
         this.updateById(c);
+    }
+
+    @Override
+    public CoinDto info(String coinId) {
+        LocalDateTime now = LocalDateTime.now();
+        now = algorithmService.convertBeforeThirtyMinute(now);
+        LocalDateTime today = now.withSecond(0).withMinute(0).withHour(0);
+        LocalDateTime yestoday = today.minusDays(1);
+        return coinMapper.selectInfo(coinId, now, today, yestoday);
     }
 }

@@ -2,8 +2,11 @@ package com.example.xnb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.xnb.entity.Coin;
+import com.example.xnb.pojo.dto.CoinDto;
+import com.example.xnb.pojo.dto.CoinListDto;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -17,4 +20,8 @@ import java.util.List;
 public interface CoinMapper extends BaseMapper<Coin> {
 
     List<Coin> selectNeedGenerateCoin(@Param("now") String now);
+
+    List<CoinListDto> selectAllList(@Param("ids") List<String> ids, @Param("now") LocalDateTime now, @Param("yestoday") LocalDateTime yestoday);
+
+    CoinDto selectInfo(@Param("id") String id, @Param("now") LocalDateTime now, @Param("today") LocalDateTime today, @Param("yestoday") LocalDateTime yestoday);
 }
