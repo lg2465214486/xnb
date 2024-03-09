@@ -2,10 +2,11 @@ package com.example.xnb.service.impl;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.xnb.config.AdminSession;
 import com.example.xnb.entity.Coin;
+import com.example.xnb.entity.HoldCoin;
+import com.example.xnb.entity.User;
 import com.example.xnb.entity.UserCoinCollect;
 import com.example.xnb.exception.GlobalException;
 import com.example.xnb.mapper.CandlestickChartMapper;
@@ -17,10 +18,12 @@ import com.example.xnb.pojo.dto.CoinListDto;
 import com.example.xnb.service.AlgorithmService;
 import com.example.xnb.service.ICandlestickChartService;
 import com.example.xnb.service.ICoinService;
+import com.example.xnb.service.IHoldCoinService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,6 +47,8 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
     private CandlestickChartMapper candlestickChartsMapper;
     @Autowired
     private CoinMapper coinMapper;
+    @Autowired
+    private IHoldCoinService holdCoinService;
 
 
     @Transactional(rollbackFor = Exception.class)
@@ -66,7 +71,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         List<CoinListDto> coinList = null;
         LocalDateTime nowTime = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
         String now = LocalDateTimeUtil.format(LocalDateTime.now().withSecond(0).withMinute(0).withHour(0), "yyyy-MM-dd HH:mm:ss");
-        String yestoday = LocalDateTimeUtil.format(nowTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
+        String yesterday = LocalDateTimeUtil.format(nowTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
         if (1 == collect) {
             if (null == AdminSession.getInstance().admin()) {
                 return null;
@@ -77,9 +82,9 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
             List<UserCoinCollect> collects = userCoinCollectMapper.selectList(collectWrapper);
             List<String> coinIds = collects.stream().map(UserCoinCollect::getCoinId).collect(Collectors.toList());
             coinIds.add("aaaaaaaaaa");
-            coinList = coinMapper.selectAllList(coinIds, now, yestoday);
+            coinList = coinMapper.selectAllList(coinIds, now, yesterday);
         } else {
-            coinList = coinMapper.selectAllList(null, now, yestoday);
+            coinList = coinMapper.selectAllList(null, now, yesterday);
         }
         for (CoinListDto c : coinList) {
             List<Object> l = new ArrayList<>();
@@ -118,10 +123,39 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
     @Override
     public CoinDto info(String coinId) {
         LocalDateTime nowTime = LocalDateTime.now();
-        String now = LocalDateTimeUtil.format(algorithmService.convertBeforeThirtyMinute(nowTime), "yyyy-MM-dd HH:mm:ss");
-        LocalDateTime todayTime = nowTime.withSecond(0).withMinute(0).withHour(0);
-        String today = LocalDateTimeUtil.format(nowTime.withSecond(0).withMinute(0).withHour(0), "yyyy-MM-dd HH:mm:ss");
-        String yestoday = LocalDateTimeUtil.format(todayTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
-        return coinMapper.selectInfo(coinId, now, today, yestoday);
+        LocalDateTime todayTime = algorithmService.convertBeforeThirtyMinute(nowTime);
+        String today = LocalDateTimeUtil.format(todayTime, "yyyy-MM-dd HH:mm:ss");
+        String yesterday = LocalDateTimeUtil.format(todayTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
+        CoinDto coinDto = coinMapper.selectInfo(coinId, today, yesterday);
+        if (null == coinDto) {
+            return null;
+        }
+        coinDto.setIncrease24Hours(coinDto.getIncrease24Hours().setScale(2, RoundingMode.DOWN));
+        
+        coinDto.setHigh(candlestickChartsMapper.maxOf24Hours(coinId, today, yesterday));
+        coinDto.setLow(candlestickChartsMapper.minOf24Hours(coinId, today, yesterday));
+        
+        User user = AdminSession.getInstance().admin();
+        if (null == user) {
+            coinDto.setIsCollect(0);
+        } else {
+            List<UserCoinCollect> list = userCoinCollectMapper.selectList(new LambdaQueryWrapper<UserCoinCollect>()
+                    .eq(UserCoinCollect::getUserId, user.getId())
+                    .eq(UserCoinCollect::getCoinId, coinId));
+            HoldCoin holdCoin = holdCoinService.getOne(new LambdaQueryWrapper<HoldCoin>()
+                    .eq(HoldCoin::getUserId, user.getId())
+                    .eq(HoldCoin::getCoinId, coinId));
+            if (ObjectUtils.isEmpty(holdCoin)) {
+                coinDto.setHoldCount(BigDecimal.ZERO);
+            } else {
+                coinDto.setHoldCount(holdCoin.getCount()); 
+            }
+            if (list.size() == 0) {
+                coinDto.setIsCollect(0);
+            } else {
+                coinDto.setIsCollect(1);
+            }
+        }
+        return coinDto;
     }
 }

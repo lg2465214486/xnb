@@ -10,6 +10,7 @@ import com.example.xnb.mapper.CandlestickChartMapper;
 import com.example.xnb.service.AlgorithmService;
 import com.example.xnb.service.ICandlestickChartService;
 import com.example.xnb.service.ICoinService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +30,16 @@ public class CandlestickChartServiceImpl extends ServiceImpl<CandlestickChartMap
 
     @Autowired
     private ICoinService coinService;
+    @Autowired
+    private CandlestickChartMapper candlestickChartMapper;
 
     @Override
     public JsonResult lineList(String coinId, String flag) {
         List<List<Object>> returnList = new ArrayList<>();
+        String now = LocalDateTimeUtil.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss");
         LambdaQueryWrapper<CandlestickChart> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CandlestickChart::getCoinId, coinId);
-        wrapper.lt(CandlestickChart::getTime, LocalDateTimeUtil.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss"));
+        wrapper.lt(CandlestickChart::getTime, now);
         switch (flag) {
             case "hour" :
                 wrapper.like(CandlestickChart::getTime, ":00:00");
@@ -53,6 +57,7 @@ public class CandlestickChartServiceImpl extends ServiceImpl<CandlestickChartMap
                 break;
         }
         List<CandlestickChart> list = this.list(wrapper);
+        list.add(candlestickChartMapper.selectLastData(coinId, now));
         BigDecimal x = new BigDecimal(0);
         for (CandlestickChart c : list) {
             List<Object> line = new ArrayList<>();

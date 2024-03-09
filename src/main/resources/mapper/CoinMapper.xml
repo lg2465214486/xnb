@@ -16,7 +16,7 @@
                b.price/c.price*100 as increase24Hours
         from coin a
                  left join (select * from candlestick_chart where time = #{now}) b on a.id = b.coin_id
-                 left join (select * from candlestick_chart where time = #{yestoday}) c on a.id = c.coin_id
+                 left join (select * from candlestick_chart where time = #{yesterday}) c on a.id = c.coin_id
         where a.is_del = 0
         <if test="ids != null">
           and a.id in
@@ -36,15 +36,13 @@
                a.price as price,
                a.circulate_count as circulateCount,
                a.home_link as homeLink,
+               a.blockchain as blockchain,
                a.white_paper as whitePaper,
                a.blockchain as blockchain,
-               b.price/c.price*100 as increase24Hours,
-               d.max_price as high,
-               d.min_price as low
+               b.price/c.price*100 as increase24Hours
         from coin a
                  left join (select * from candlestick_chart where time = #{today}) b on a.id = b.coin_id
-                 left join (select * from candlestick_chart where time = #{yestoday}) c on a.id = c.coin_id
-                 left join (select * from candlestick_chart where time = #{now}) d on a.id = d.coin_id
+                 left join (select * from candlestick_chart where time = #{yesterday}) c on a.id = c.coin_id
         where a.is_del = 0 and a.id=#{id}
     </select>
 

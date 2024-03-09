@@ -24,6 +24,8 @@ public class AddCoinParam {
 
      Integer issueCount;
 
+     BigDecimal defaultPrice;
+
      BigDecimal price;
 
      Integer circulateCount;
@@ -31,4 +33,6 @@ public class AddCoinParam {
      String homeLink;
 
      String whitePaper;
+
+     String blockchain;
 }

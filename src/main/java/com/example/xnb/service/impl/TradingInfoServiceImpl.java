@@ -25,6 +25,7 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -78,6 +79,7 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
 
             if (ObjectUtils.isEmpty(holdCoin)) {
                 holdCoin = new HoldCoin();
+                holdCoin.setId(UUID.randomUUID().toString().replace("-", ""));
                 holdCoin.setUserId(user.getId());
                 holdCoin.setCoinId(coin.getId());
                 holdCoin.setCount(param.getCount());

@@ -2,6 +2,7 @@ package com.example.xnb.controller;
 
 import com.example.xnb.config.AdminSession;
 import com.example.xnb.config.JsonResult;
+import com.example.xnb.entity.User;
 import com.example.xnb.pojo.TradingParam;
 import com.example.xnb.pojo.TradingSelectParam;
 import com.example.xnb.service.ITradingInfoService;
@@ -35,6 +36,9 @@ public class TradingController {
 
     @GetMapping("/info")
     public JsonResult info(String coinId) {
-        return new JsonResult(tradingInfoService.info(coinId, AdminSession.getInstance().admin().getId()));
+        User user = AdminSession.getInstance().admin();
+        if (null == user)
+            return null;
+        return new JsonResult(tradingInfoService.info(coinId, user.getId()));
     }
 }

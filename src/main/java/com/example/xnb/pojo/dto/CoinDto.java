@@ -34,7 +34,12 @@ public class CoinDto {
 
     private String whitePaper;
 
+    private String blockchain;
+
     private BigDecimal increase24Hours;
     private BigDecimal high;
     private BigDecimal low;
+
+    private Integer isCollect;
+    private BigDecimal holdCount;
 }
