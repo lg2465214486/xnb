@@ -68,11 +68,15 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         String now = LocalDateTimeUtil.format(LocalDateTime.now().withSecond(0).withMinute(0).withHour(0), "yyyy-MM-dd HH:mm:ss");
         String yestoday = LocalDateTimeUtil.format(nowTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
         if (1 == collect) {
+            if (null == AdminSession.getInstance().admin()) {
+                return null;
+            }
             Integer id = AdminSession.getInstance().admin().getId();
             LambdaQueryWrapper<UserCoinCollect> collectWrapper = new LambdaQueryWrapper<>();
             collectWrapper.eq(UserCoinCollect::getUserId, id);
             List<UserCoinCollect> collects = userCoinCollectMapper.selectList(collectWrapper);
             List<String> coinIds = collects.stream().map(UserCoinCollect::getCoinId).collect(Collectors.toList());
+            coinIds.add("aaaaaaaaaa");
             coinList = coinMapper.selectAllList(coinIds, now, yestoday);
         } else {
             coinList = coinMapper.selectAllList(null, now, yestoday);

@@ -3,6 +3,7 @@ package com.example.xnb.controller;
 import com.example.xnb.config.AdminSession;
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.pojo.TradingParam;
+import com.example.xnb.pojo.TradingSelectParam;
 import com.example.xnb.service.ITradingInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -25,6 +26,11 @@ public class TradingController {
         param.setUserId(AdminSession.getInstance().admin().getId());
         tradingInfoService.trading(param);
         return new JsonResult("success");
+    }
+
+    @PostMapping("/all")
+    public JsonResult allTrading(@RequestBody TradingSelectParam param) {
+        return new JsonResult(tradingInfoService.allTrading(param));
     }
 
     @GetMapping("/info")

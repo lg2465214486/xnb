@@ -1,18 +1,19 @@
 package com.example.xnb.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.xnb.config.AdminSession;
-import com.example.xnb.entity.Coin;
-import com.example.xnb.entity.HoldCoin;
-import com.example.xnb.entity.TradingInfo;
-import com.example.xnb.entity.User;
+import com.example.xnb.entity.*;
 import com.example.xnb.exception.GlobalException;
 import com.example.xnb.mapper.HoldCoinMapper;
 import com.example.xnb.mapper.TradingInfoMapper;
 import com.example.xnb.mapper.UserMapper;
 import com.example.xnb.pojo.TradingParam;
+import com.example.xnb.pojo.TradingSelectParam;
+import com.example.xnb.pojo.dto.TradingSelectDto;
 import com.example.xnb.service.ICoinService;
 import com.example.xnb.service.ITradingInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,8 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
     private ICoinService coinService;
     @Autowired
     private HoldCoinMapper holdCoinMapper;
+    @Autowired
+    private TradingInfoMapper tradingInfoMapper;
 
     @Override
     public List<TradingInfo> info(String coinId, Integer id) {
@@ -108,5 +111,23 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
 
         userMapper.updateById(user);
         this.save(tradingInfo);
+    }
+
+    @Override
+    public Page<TradingSelectDto> allTrading(TradingSelectParam param) {
+        Page<TradingSelectDto> page = new Page<>();
+        page.setCurrent(param.getPageNo());
+        page.setSize(param.getPageSize());
+        Page<TradingSelectDto> pages = tradingInfoMapper.selectAllTradingList(page, param);
+
+        Map<Integer, User> users = userMapper.selectList(new QueryWrapper<>()).stream().collect(Collectors.toMap(User::getId, o -> o));
+        Map<String, Coin> coins = coinService.list().stream().collect(Collectors.toMap(Coin::getId, o -> o));
+
+        for (TradingSelectDto r : pages.getRecords()) {
+            r.setCoin(coins.get(r.getCoinId()));
+            r.setUser(users.get(r.getUserId()));
+        }
+
+        return page;
     }
 }

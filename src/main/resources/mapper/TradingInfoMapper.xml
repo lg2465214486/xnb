@@ -2,4 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.xnb.mapper.TradingInfoMapper">
 
+    <select id="selectAllTradingList" resultType="com.example.xnb.pojo.dto.TradingSelectDto">
+        select a.*
+        from trading_info a
+                 left join user b on a.user_id = b.id
+                 left join coin c on a.coin_id = c.id
+        where 1 = 1
+        <if test="param.keywords != null">
+            and
+            (b.uuid like concat('%',#{param.keywords},'%')
+            or b.user_name like concat('%',#{param.keywords},'%')
+            or b.user_email like concat('%',#{param.keywords},'%')
+            or b.phone like concat('%',#{param.keywords},'%')
+            )
+        </if>
+        <if test="param.coinId != null">
+          and c.id = #{param.coinId}
+        </if>
+        <if test="param.count != null">
+            and a.count = #{param.count}
+        </if>
+        <if test="param.status != null">
+            and a.status = #{status}
+        </if>
+        <if test="param.minPrice != null">
+            and a.price > #{param.minPrice}
+        </if>
+        <if test="param.maxPrice != null">
+            and a.price > #{param.maxPrice}
+        </if>
+    </select>
 </mapper>
