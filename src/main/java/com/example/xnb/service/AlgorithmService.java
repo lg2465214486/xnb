@@ -9,4 +9,6 @@ public interface AlgorithmService {
     void addCoinGenerateData(Coin param);
 
     List<LocalDateTime> generateTimeList(LocalDateTime startTime, LocalDateTime endTime);
+
+    LocalDateTime convertThirtyMinute(LocalDateTime time);
 }

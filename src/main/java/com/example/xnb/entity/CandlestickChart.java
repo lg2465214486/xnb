@@ -43,4 +43,8 @@ public class CandlestickChart implements Serializable {
     public void setTime(LocalDateTime time) {
         this.time = LocalDateTimeUtil.format(time, "yyyy-MM-dd HH:mm:ss");
     }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
 }

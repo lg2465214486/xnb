@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -30,6 +31,7 @@ public class CandlestickChartServiceImpl extends ServiceImpl<CandlestickChartMap
         List<List<Object>> returnList = new ArrayList<>();
         LambdaQueryWrapper<CandlestickChart> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(CandlestickChart::getCoinId, coinId);
+        wrapper.lt(CandlestickChart::getTime, LocalDateTimeUtil.format(LocalDateTime.now(), "yyyy-MM-dd HH:mm:ss"));
         switch (flag) {
             case "hour" :
                 wrapper.like(CandlestickChart::getTime, ":00:00");

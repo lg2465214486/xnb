@@ -43,7 +43,7 @@ public class Coin implements Serializable {
 
     private BigDecimal price;
 
-    private Integer increase;
+    private BigDecimal increase;
 
     private Integer isDel;
 

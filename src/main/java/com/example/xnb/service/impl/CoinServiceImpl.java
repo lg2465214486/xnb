@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -82,7 +84,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         if (ObjectUtils.isEmpty(c)) {
             throw new GlobalException(500, "不存在");
         }
-        c.setIncrease(increase);
+        c.setIncrease(new BigDecimal(increase).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
         this.updateById(c);
     }
 }

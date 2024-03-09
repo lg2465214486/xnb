@@ -120,6 +120,7 @@ public class AlgorithmServiceImpl implements AlgorithmService {
         return list;
     }
 
+    @Override
     public LocalDateTime convertThirtyMinute(LocalDateTime time) {
         time = time.withSecond(0);
         if (time.getMinute() > 0 && time.getMinute() < 30) {

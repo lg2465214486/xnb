@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.xnb.mapper.CoinMapper">
 
+    <select id="selectNeedGenerateCoin" resultType="com.example.xnb.entity.Coin">
+        select a.*
+        from coin a
+                 left join (select * from candlestick_chart where time = #{now}) b on a.id = b.coin_id
+        where b.coin_id is null;
+    </select>
 </mapper>
