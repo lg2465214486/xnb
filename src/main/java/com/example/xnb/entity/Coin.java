@@ -53,6 +53,8 @@ public class Coin implements Serializable {
 
     private String whitePaper;
 
+    private String blockchain;
+
     @TableField(exist = false)
     private BigDecimal startPrice;
 

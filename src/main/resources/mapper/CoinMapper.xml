@@ -37,6 +37,7 @@
                a.circulate_count as circulateCount,
                a.home_link as homeLink,
                a.white_paper as whitePaper,
+               a.blockchain as blockchain,
                b.price/c.price*100 as increase24Hours,
                d.max_price as high,
                d.min_price as low
