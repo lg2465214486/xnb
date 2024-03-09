@@ -339,7 +339,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userInfo.setEth(user.getEth().setScale(4, RoundingMode.HALF_UP).toPlainString());
         userInfo.setUstd(user.getUstd().setScale(4, RoundingMode.HALF_UP).toPlainString());
         userInfo.setBtc(user.getBtc().setScale(4, RoundingMode.HALF_UP).toPlainString());
-        userInfo.setIsReal(user.getIsReal());
+        userInfo.setIsReal(ObjectUtil.isEmpty(realService.list(new LambdaQueryWrapper<Real>().eq(Real::getUserId, user.getId())))? 0:1);
         return userInfo;
     }
 

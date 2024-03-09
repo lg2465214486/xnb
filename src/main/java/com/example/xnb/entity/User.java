@@ -78,11 +78,6 @@ public class User implements Serializable {
      */
     private Boolean isStop;
 
-    /**
-     * 是否实名  0：否  1：是
-     */
-    private Integer isReal;
-
     private String token;
 
     private String userType;

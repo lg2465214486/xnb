@@ -83,7 +83,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
             l.add(c.getName());
             l.add(c.getImage());
             l.add(c.getPrice());
-            l.add(c.getIncrease24Hours());
+            l.add(c.getIncrease24Hours().setScale(2, RoundingMode.DOWN));
             returnList.add(l);
         }
         return returnList;

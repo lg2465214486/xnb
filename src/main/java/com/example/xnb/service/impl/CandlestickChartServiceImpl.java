@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.xnb.config.JsonResult;
 import com.example.xnb.entity.CandlestickChart;
+import com.example.xnb.entity.Coin;
 import com.example.xnb.mapper.CandlestickChartMapper;
 import com.example.xnb.service.AlgorithmService;
 import com.example.xnb.service.ICandlestickChartService;
+import com.example.xnb.service.ICoinService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,8 @@ import java.util.Random;
 @Service
 public class CandlestickChartServiceImpl extends ServiceImpl<CandlestickChartMapper, CandlestickChart> implements ICandlestickChartService {
 
+    @Autowired
+    private ICoinService coinService;
 
     @Override
     public JsonResult lineList(String coinId, String flag) {
