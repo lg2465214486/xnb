@@ -45,7 +45,7 @@ public class JobService {
         for (Coin coin : list) {
             BigDecimal increase = coin.getIncrease();
             if (ObjectUtils.isEmpty(increase)) {
-                increase = new BigDecimal(MY_RANDOM.nextInt(900) + 100).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
+                increase = new BigDecimal(MY_RANDOM.nextInt(150) + 50).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP);
                 increase = increase.multiply(MY_RANDOM.nextInt(2) == 0 ? new BigDecimal(-1):BigDecimal.ONE);
             }
 
@@ -53,17 +53,20 @@ public class JobService {
             candlestickChart.setTime(nowTime);
             candlestickChart.setWeek(nowTime.getDayOfWeek().getValue());
             candlestickChart.setCoinId(coin.getId());
-            BigDecimal price = coin.getPrice().add(coin.getPrice().multiply(increase));
+            BigDecimal price = coin.getPrice().add(coin.getPrice().multiply(increase).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChart.setPrice(price);
 
-            int thisTimeMax = price.intValue() * 110 / 100;
-            int thisTimeMin = price.intValue() * 90 / 100;
+            int intPrice = price.multiply(new BigDecimal(100)).intValue();
+            int thisTimeMax = intPrice * (100 + Math.abs(increase.intValue())) / 100;
+            int thisTimeMin = intPrice * (100 - Math.abs(increase.intValue())) / 100;
 
-            candlestickChart.setMaxPrice(new BigDecimal(price.intValue() + MY_RANDOM.nextInt(thisTimeMax - price.intValue() + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
-            candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(price.intValue() - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+            candlestickChart.setMaxPrice(new BigDecimal(intPrice + MY_RANDOM.nextInt(thisTimeMax - intPrice + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
+            candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(intPrice - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
 
             coin.setIncrease(null);
+            coin.setPrice(price);
             coinMapper.updateById(coin);
+            candlestickChartMapper.insert(candlestickChart);
         }
     }
 }

@@ -67,8 +67,8 @@ public class AlgorithmServiceImpl implements AlgorithmService {
             int price = datas.get(i % 48);
             candlestickChart.setPrice(new BigDecimal(price).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
 
-            int thisTimeMax = price * 110 / 100;
-            int thisTimeMin = price * 90 / 100;
+            int thisTimeMax = price * 103 / 100;
+            int thisTimeMin = price * 97 / 100;
 
             candlestickChart.setMaxPrice(new BigDecimal(price + MY_RANDOM.nextInt(thisTimeMax - price + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(price - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
@@ -97,8 +97,8 @@ public class AlgorithmServiceImpl implements AlgorithmService {
                 candlestickChart.setPrice(new BigDecimal(p + sss[i]).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             }
             int price = candlestickChart.getPrice().multiply(new BigDecimal(100)).intValue();
-            int thisTimeMax = price * 110 / 100;
-            int thisTimeMin = price * 90 / 100;
+            int thisTimeMax = price * 102 / 100;
+            int thisTimeMin = price * 98 / 100;
 
             candlestickChart.setMaxPrice(new BigDecimal(price + MY_RANDOM.nextInt(thisTimeMax - price + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(price - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
