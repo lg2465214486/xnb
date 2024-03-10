@@ -24,6 +24,4 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("select * from user where uuid=#{uuid}")
     User selectByUuid(String uuid);
 
-    @Update("update `user` set is_real = 1 where id=#{id}")
-    void updateRealStatus(Integer Id);
 }

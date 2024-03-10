@@ -39,7 +39,6 @@ public class RealServiceImpl extends ServiceImpl<RealMapper, Real> implements IR
     public Object add(Integer userId, RealParam param) {
         List<Real> list = this.list(new LambdaQueryWrapper<Real>().eq(Real::getUserId, userId));
         if (list.size() > 0) {
-            userMapper.updateRealStatus(userId);
             throw new GlobalException(500, "已实名");
         }
         Real real = new Real();

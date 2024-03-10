@@ -33,7 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AdminHandlerInterceptor()).addPathPatterns("/**").excludePathPatterns("/account/**","/qwertyuiop/user/add", "/pub/**","/multiFile/**");
+        registry.addInterceptor(new AdminHandlerInterceptor()).addPathPatterns("/**").excludePathPatterns("/account/**","/qwertyuiop/user/add", "/pub/**","/multiFile/**", "/line/**", "/coin/**");
     }
 
     public class AdminHandlerInterceptor extends HandlerInterceptorAdapter {

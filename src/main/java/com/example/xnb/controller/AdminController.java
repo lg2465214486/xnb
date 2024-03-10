@@ -4,10 +4,7 @@ import com.example.xnb.config.JsonResult;
 import com.example.xnb.config.JsonResultUtil;
 import com.example.xnb.entity.Vip;
 import com.example.xnb.mapper.VipMapper;
-import com.example.xnb.pojo.ExamineParam;
-import com.example.xnb.pojo.SysEditParam;
-import com.example.xnb.pojo.ListParam;
-import com.example.xnb.pojo.UserParam;
+import com.example.xnb.pojo.*;
 import com.example.xnb.service.*;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +29,11 @@ public class AdminController {
     private IWithdrawService withdrawService;
     @Autowired
     private CommonService commonService;
+    @Autowired
+    private ICoinService coinService;
+    @Autowired
+    private ITradingInfoService tradingInfoService;
+
     /**
      * 用户列表
      * @return
@@ -144,6 +146,59 @@ public class AdminController {
     @PostMapping("/sys/edit")
     public JsonResult edit(@RequestBody SysEditParam param) {
         return new JsonResult(systemService.editKeyValue(param.getKey(), param.getValue()));
+    }
+
+    @GetMapping("/coin/list")
+    public JsonResult coinList(String keywords, long pageNo, long pageSize) {
+        return new JsonResult(coinService.adminAllList(keywords, pageNo, pageSize));
+    }
+
+
+    /**
+     * 添加coin
+     * @return
+     */
+    @PostMapping("/add")
+    public JsonResult add(@RequestBody AddCoinParam param) {
+        coinService.addCoin(param);
+        return new JsonResult("success");
+    }
+
+    /**
+     * 编辑coin
+     * @return
+     */
+    @PostMapping("/edit")
+    public JsonResult edit(@RequestBody AddCoinParam param) {
+        coinService.editCoin(param);
+        return new JsonResult("success");
+    }
+
+
+    /**
+     * 设置涨幅
+     * @return
+     */
+    @GetMapping("/setIncrease")
+    public JsonResult setIncrease(String coinId, String increase) {
+        coinService.setIncrease(coinId, increase);
+        return new JsonResult("success");
+    }
+
+
+    /**
+     * 删除coin
+     * @return
+     */
+    @GetMapping("/del")
+    public JsonResult del(String coinId) {
+        coinService.delCoin(coinId);
+        return new JsonResult("success");
+    }
+
+    @PostMapping("/trading/all")
+    public JsonResult allTrading(@RequestBody TradingSelectParam param) {
+        return new JsonResult(tradingInfoService.allTrading(param));
     }
 
 }

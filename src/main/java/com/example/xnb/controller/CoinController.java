@@ -24,35 +24,6 @@ public class CoinController {
     @Autowired
     private IHoldCoinService holdCoinList;
 
-    /**
-     * 添加coin
-     * @return
-     */
-    @PostMapping("/add")
-    public JsonResult add(@RequestBody AddCoinParam param) {
-        coinService.addCoin(param);
-        return new JsonResult("success");
-    }
-
-    /**
-     * 删除coin
-     * @return
-     */
-    @PostMapping("/del")
-    public JsonResult del(String coinId) {
-        coinService.delCoin(coinId);
-        return new JsonResult("success");
-    }
-
-    /**
-     * 设置涨幅
-     * @return
-     */
-    @PostMapping("/setIncrease")
-    public JsonResult setIncrease(String coinId, int increase) {
-        coinService.setIncrease(coinId, increase);
-        return new JsonResult("success");
-    }
 
     @GetMapping("/list")
     public JsonResult coinList(int collect) {

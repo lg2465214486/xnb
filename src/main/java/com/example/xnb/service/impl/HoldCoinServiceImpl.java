@@ -36,11 +36,14 @@ public class HoldCoinServiceImpl extends ServiceImpl<HoldCoinMapper, HoldCoin> i
         List<HoldCoin> list = this.list(new LambdaQueryWrapper<HoldCoin>().eq(HoldCoin::getUserId, userId));
         Map<String, Coin> coinMap = coinService.list().stream().collect(Collectors.toMap(Coin::getId, o -> o));
         for (HoldCoin h : list) {
+            Coin coin = coinMap.get(h.getCoinId());
             List<Object> l = new ArrayList<>();
             l.add(coinMap.get(h.getCoinId()).getName());
             l.add(coinMap.get(h.getCoinId()).getImage());
             l.add(h.getCount());
-            l.add(h.getCount().multiply(coinMap.get(h.getCoinId()).getPrice()).divide(h.getPrice(), 2, RoundingMode.HALF_UP).subtract(new BigDecimal(100)));
+            l.add(h.getCount().multiply(new BigDecimal(100)).multiply(coin.getPrice()).divide(h.getPrice(), 2, RoundingMode.HALF_UP).subtract(new BigDecimal(100)));
+            l.add(coin.getId());
+            l.add(coin.getPrice());
             returnList.add(l);
         }
         return returnList;

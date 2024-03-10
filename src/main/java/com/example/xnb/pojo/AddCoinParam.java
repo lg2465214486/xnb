@@ -12,6 +12,9 @@ import java.time.LocalDateTime;
 
 @Data
 public class AddCoinParam {
+
+     String id;
+
      String name;
 
      String image;

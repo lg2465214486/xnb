@@ -2,12 +2,10 @@ package com.example.xnb.service.impl;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.xnb.config.AdminSession;
-import com.example.xnb.entity.Coin;
-import com.example.xnb.entity.HoldCoin;
-import com.example.xnb.entity.User;
-import com.example.xnb.entity.UserCoinCollect;
+import com.example.xnb.entity.*;
 import com.example.xnb.exception.GlobalException;
 import com.example.xnb.mapper.CandlestickChartMapper;
 import com.example.xnb.mapper.CoinMapper;
@@ -24,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -69,9 +68,10 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
     public List<List<Object>> allList(int collect) {
         List<List<Object>> returnList = new ArrayList<>();
         List<CoinListDto> coinList = null;
-        LocalDateTime nowTime = LocalDateTime.now().withSecond(0).withMinute(0).withHour(0);
-        String now = LocalDateTimeUtil.format(LocalDateTime.now().withSecond(0).withMinute(0).withHour(0), "yyyy-MM-dd HH:mm:ss");
-        String yesterday = LocalDateTimeUtil.format(nowTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
+        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDateTime todayTime = algorithmService.convertBeforeThirtyMinute(nowTime);
+        String now = LocalDateTimeUtil.format(todayTime, "yyyy-MM-dd HH:mm:ss");
+        String yesterday = LocalDateTimeUtil.format(todayTime.minusDays(1), "yyyy-MM-dd HH:mm:ss");
         if (1 == collect) {
             if (null == AdminSession.getInstance().admin()) {
                 return null;
@@ -92,7 +92,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
             l.add(c.getName());
             l.add(c.getImage());
             l.add(c.getPrice());
-            l.add(c.getIncrease24Hours().setScale(2, RoundingMode.DOWN));
+            l.add(null == c.getIncrease24Hours()? BigDecimal.ZERO:c.getIncrease24Hours().setScale(2, RoundingMode.DOWN));
             returnList.add(l);
         }
         return returnList;
@@ -111,13 +111,17 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void setIncrease(String coinId, int increase) {
+    public void setIncrease(String coinId, String increase) {
         Coin c = this.getOne(new LambdaQueryWrapper<Coin>().eq(Coin::getIsDel, 0).eq(Coin::getId, coinId));
         if (ObjectUtils.isEmpty(c)) {
             throw new GlobalException(500, "不存在");
         }
-        c.setIncrease(new BigDecimal(increase).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
-        this.updateById(c);
+        if (null == increase || "".equals(increase)) {
+            coinMapper.setIncreaseNullById(coinId);
+        } else {
+            c.setIncrease(new BigDecimal(increase));
+            this.updateById(c);
+        }
     }
 
     @Override
@@ -130,7 +134,7 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
         if (null == coinDto) {
             return null;
         }
-        coinDto.setIncrease24Hours(coinDto.getIncrease24Hours().setScale(2, RoundingMode.DOWN));
+        coinDto.setIncrease24Hours(null == coinDto.getIncrease24Hours()? BigDecimal.ZERO:coinDto.getIncrease24Hours().setScale(2, RoundingMode.DOWN));
         
         coinDto.setHigh(candlestickChartsMapper.maxOf24Hours(coinId, today, yesterday));
         coinDto.setLow(candlestickChartsMapper.minOf24Hours(coinId, today, yesterday));
@@ -157,5 +161,28 @@ public class CoinServiceImpl extends ServiceImpl<CoinMapper, Coin> implements IC
             }
         }
         return coinDto;
+    }
+
+    @Override
+    public Page<Coin> adminAllList(String keywords, long pageNo, long pageSize) {
+        Page<Coin> page = new Page<>();
+        page.setCurrent(pageNo);
+        page.setSize(pageSize);
+        LambdaQueryWrapper<Coin> wrapper = new LambdaQueryWrapper<>();
+        if (null != keywords)
+            wrapper.like(Coin::getName, keywords);
+        wrapper.eq(Coin::getIsDel, 0);
+        wrapper.orderByDesc(Coin::getCreatedTime);
+        return this.page(page, wrapper);
+    }
+
+    @Override
+    public void editCoin(AddCoinParam param) {
+        Coin coin = this.getById(param.getId());
+        if (1 == coin.getIsDel()) {
+            throw new GlobalException(500, "is deleted");
+        }
+        BeanUtils.copyProperties(param, coin);
+        this.updateById(coin);
     }
 }

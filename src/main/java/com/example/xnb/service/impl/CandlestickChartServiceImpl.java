@@ -57,7 +57,9 @@ public class CandlestickChartServiceImpl extends ServiceImpl<CandlestickChartMap
                 break;
         }
         List<CandlestickChart> list = this.list(wrapper);
-        list.add(candlestickChartMapper.selectLastData(coinId, now));
+        CandlestickChart lastData = candlestickChartMapper.selectLastData(coinId, now);
+        if (null != lastData)
+            list.add(candlestickChartMapper.selectLastData(coinId, now));
         BigDecimal x = new BigDecimal(0);
         for (CandlestickChart c : list) {
             List<Object> line = new ArrayList<>();

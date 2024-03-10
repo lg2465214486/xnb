@@ -17,6 +17,8 @@ import com.example.xnb.pojo.dto.TradingSelectDto;
 import com.example.xnb.service.ICoinService;
 import com.example.xnb.service.ITradingInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -44,6 +47,8 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
     private HoldCoinMapper holdCoinMapper;
     @Autowired
     private TradingInfoMapper tradingInfoMapper;
+    @Autowired
+    private RedisTemplate<String, User> redisTemplate;
 
     @Override
     public List<TradingInfo> info(String coinId, Integer id) {
@@ -54,14 +59,29 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
         return this.list(wrapper);
     }
 
+    public boolean lock(String key, int timeout, TimeUnit timeUnit) {
+        RedisConnection connection = redisTemplate.getConnectionFactory().getConnection();
+        Boolean lock = connection.setNX(key.getBytes(), new byte[0]);
+        if(lock){
+            redisTemplate.expire(key, timeout, timeUnit);
+        }
+        connection.close();
+        return lock;
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void trading(TradingParam param) {
-        LocalDateTime now = LocalDateTime.now();
-        User user = userMapper.selectById(AdminSession.getInstance().admin().getId());
+        User user = AdminSession.getInstance().admin();
         if (ObjectUtils.isEmpty(user)) {
             throw new GlobalException(500, "session expired");
         }
+        user = userMapper.selectById(AdminSession.getInstance().admin().getId());
+        if (!this.lock("TRADING===" + user.getId(), 2000, TimeUnit.MILLISECONDS)) {
+            throw new GlobalException(500, "not allowed");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
         Coin coin = coinService.getOne(new LambdaQueryWrapper<Coin>().eq(Coin::getId, param.getCoinId()).eq(Coin::getIsDel, 0));
         if (ObjectUtils.isEmpty(coin)) {
             throw new GlobalException(500, "coin not exist");
@@ -98,9 +118,13 @@ public class TradingInfoServiceImpl extends ServiceImpl<TradingInfoMapper, Tradi
             if (param.getCount().compareTo(holdCoin.getCount()) > 0) {
                 throw new GlobalException(500, "hold coi not enough");
             }
-            holdCoin.setCount(holdCoin.getCount().subtract(param.getCount()).setScale(2, RoundingMode.HALF_UP));
-            holdCoin.setPrice(holdCoin.getPrice().subtract(price).setScale(2, RoundingMode.HALF_UP));
-            holdCoinMapper.updateById(holdCoin);
+            if (holdCoin.getCount().compareTo(param.getCount()) == 0) {
+                holdCoinMapper.deleteById(holdCoin.getId());
+            } else {
+                holdCoin.setCount(holdCoin.getCount().subtract(param.getCount()).setScale(2, RoundingMode.HALF_UP));
+                holdCoin.setPrice(holdCoin.getPrice().subtract(price).setScale(2, RoundingMode.HALF_UP));
+                holdCoinMapper.updateById(holdCoin);
+            }
             user.setUstd(user.getUstd().add(price).setScale(2, RoundingMode.HALF_UP));
         }
         tradingInfo.setUserId(user.getId());

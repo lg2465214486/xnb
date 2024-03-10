@@ -63,7 +63,6 @@ public class JobService {
             candlestickChart.setMaxPrice(new BigDecimal(intPrice + MY_RANDOM.nextInt(thisTimeMax - intPrice + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(intPrice - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
 
-            coin.setIncrease(null);
             coin.setPrice(price);
             coinMapper.updateById(coin);
             candlestickChartMapper.insert(candlestickChart);

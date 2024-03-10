@@ -18,5 +18,5 @@ public class TradingSelectParam {
     BigDecimal count;
     BigDecimal maxPrice;
     BigDecimal minPrice;
-    int status;
+    Integer status;
 }

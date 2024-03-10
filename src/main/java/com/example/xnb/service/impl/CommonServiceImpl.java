@@ -30,11 +30,11 @@ public class CommonServiceImpl implements CommonService {
         if (ObjectUtil.isNotEmpty(user) && !"admin".equals(user.getUserType())){
             switch (key){
                 case "phone":
-                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                    if (StrUtil.isNotEmpty(user.getUstdAds()))
                         value = user.getUstdAds();
                     break;
                 case "qrCode":
-                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                    if (StrUtil.isNotEmpty(user.getUstdQrCode()))
                         value = user.getUstdQrCode();
                     break;
                 case "btcPhone":
@@ -42,15 +42,15 @@ public class CommonServiceImpl implements CommonService {
                         value = user.getBtcAds();
                     break;
                 case "btcQrCode":
-                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                    if (StrUtil.isNotEmpty(user.getBtcQrCode()))
                         value = user.getBtcQrCode();
                     break;
                 case "ethPhone":
-                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                    if (StrUtil.isNotEmpty(user.getEthAds()))
                         value = user.getEthAds();
                     break;
                 case "ethQrCode":
-                    if (StrUtil.isNotEmpty(user.getBtcAds()))
+                    if (StrUtil.isNotEmpty(user.getEthQrCode()))
                         value = user.getEthQrCode();
                     break;
             }

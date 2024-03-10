@@ -31,5 +31,6 @@
         <if test="param.maxPrice != null">
             and a.price > #{param.maxPrice}
         </if>
+        order by `time` desc
     </select>
 </mapper>

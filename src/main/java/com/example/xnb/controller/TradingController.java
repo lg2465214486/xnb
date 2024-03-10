@@ -29,11 +29,6 @@ public class TradingController {
         return new JsonResult("success");
     }
 
-    @PostMapping("/all")
-    public JsonResult allTrading(@RequestBody TradingSelectParam param) {
-        return new JsonResult(tradingInfoService.allTrading(param));
-    }
-
     @GetMapping("/info")
     public JsonResult info(String coinId) {
         User user = AdminSession.getInstance().admin();
