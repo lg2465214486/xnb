@@ -135,7 +135,7 @@ public class UnderwayServiceImpl extends ServiceImpl<UnderwayMapper, Underway> i
             myRate = vip.getRate();
         }
         BigDecimal daySales = sales.multiply(myRate).setScale(4,BigDecimal.ROUND_HALF_UP);
-        BigDecimal secondSales = daySales.divide(BigDecimal.valueOf(86400), 4,BigDecimal.ROUND_HALF_UP);
+        BigDecimal secondSales = daySales.divide(BigDecimal.valueOf(86400), 6,BigDecimal.ROUND_HALF_UP);
         return secondSales.multiply(BigDecimal.valueOf(absSeconds)).setScale(4,BigDecimal.ROUND_HALF_UP);
     }
 }

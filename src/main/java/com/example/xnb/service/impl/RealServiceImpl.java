@@ -8,16 +8,12 @@ import com.example.xnb.mapper.RealMapper;
 import com.example.xnb.mapper.UserMapper;
 import com.example.xnb.pojo.RealParam;
 import com.example.xnb.service.IRealService;
-import com.sun.tools.doclint.Entity;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.sun.tools.doclint.Entity.real;
-
 /**
  *
  * 2024/03/05 9:24 下午
