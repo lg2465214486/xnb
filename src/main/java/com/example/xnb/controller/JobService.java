@@ -57,8 +57,11 @@ public class JobService {
             candlestickChart.setPrice(price);
 
             int intPrice = price.multiply(new BigDecimal(100)).intValue();
-            int thisTimeMax = intPrice * (100 + Math.abs(increase.intValue())) / 100;
-            int thisTimeMin = intPrice * (100 - Math.abs(increase.intValue())) / 100;
+//            int abs = Math.abs(increase.multiply(new BigDecimal(100)).intValue());
+//            int thisTimeMax = new BigDecimal(intPrice).multiply(new BigDecimal(100).add(new BigDecimal(abs).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))).intValue();
+//            int thisTimeMin = new BigDecimal(intPrice).multiply(new BigDecimal(100).subtract(new BigDecimal(abs).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))).intValue();
+            int thisTimeMax = intPrice * 110 / 100;
+            int thisTimeMin = intPrice * 90 / 100;
 
             candlestickChart.setMaxPrice(new BigDecimal(intPrice + MY_RANDOM.nextInt(thisTimeMax - intPrice + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
             candlestickChart.setMinPrice(new BigDecimal(thisTimeMin + MY_RANDOM.nextInt(intPrice - thisTimeMin + 1)).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
